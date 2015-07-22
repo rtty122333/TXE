@@ -8,6 +8,9 @@ function login(){
   this.vk=null;
   this.passwd=null; 
   this.posturl=null;
+  this.jumpurl1=null;
+  this.jumpurl2=null;
+  this.jumpurl3=null;
 }
 
 login.prototype.initPage = function(){
@@ -30,7 +33,39 @@ login.prototype.initPage = function(){
     });
     self.passwd=$('input[type=password]').attr('name');
     self.echo();
+    self.loginSina();
   }
+});
+}
+
+login.prototype.loginSina = function(){
+  var self=this;
+  var formdata={
+    mobile: ''
+  }
+  formdata[self.passwd] = '';
+  formdata['remember'] = 'on';
+  formdata['backURL'] = self.backURL;
+  formdata['backTitle'] = self.backTitle;
+  formdata['tryCount'] = self.tryCount;
+  formdata['vk'] = self.vk;
+  formdata['submit'] = '登录';
+  //console.log(formdata);
+  request.post({url:self.posturl, formData: formdata}, function optionalCallback(err, httpResponse, body) {
+  if (err) {
+    return console.error('upload failed:', err);
+  }
+  if (httpResponse.headers.location != undefined) {
+    self.jumpurl1=httpResponse.headers.location;
+    console.log("jump first:"+self.jumpurl1);
+    request.get(self.jumpurl1,function(error,response,body){
+      if (!error) {
+        console.log(response.statusCode);
+        self.jumpurl2 = response.headers;
+        console.log(self.jumpurl2);
+      };
+    });
+  };
 });
 }
 
