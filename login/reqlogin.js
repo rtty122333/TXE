@@ -1,4 +1,4 @@
-var request = require("request");
+var request = require("request").defaults({jar: true});
 var cheerio = require("cheerio");
 
 function login(){
@@ -8,9 +8,8 @@ function login(){
   this.vk=null;
   this.passwd=null; 
   this.posturl=null;
-  this.jumpurl1=null;
-  this.jumpurl2=null;
-  this.jumpurl3=null;
+  this.jumpurl=null;
+  this.mainbody=null;
 }
 
 login.prototype.initPage = function(){
@@ -21,7 +20,6 @@ login.prototype.initPage = function(){
     self.posturl='http://login.weibo.cn/login/'+$('form').attr('action');
     $('input[type=hidden]').each(function(i,e) {
       if ($(e).attr('name')=='backURL') {
-        //console.log($(e).attr('value'));
         self.backURL=$(e).attr('value');
       }else if ($(e).attr('name')=='backTitle') {
         self.backTitle=$(e).attr('value');
@@ -56,17 +54,29 @@ login.prototype.loginSina = function(){
     return console.error('upload failed:', err);
   }
   if (httpResponse.headers.location != undefined) {
-    self.jumpurl1=httpResponse.headers.location;
-    console.log("jump first:"+self.jumpurl1);
-    request.get(self.jumpurl1,function(error,response,body){
+    self.jumpurl=httpResponse.headers.location;
+    console.log("jump first:"+self.jumpurl);
+    request.get(self.jumpurl,function(error,response,body){
       if (!error) {
         console.log(response.statusCode);
-        self.jumpurl2 = response.headers;
-        console.log(self.jumpurl2);
+        self.mainbody = response.body;
+        //console.log(self.mainbody);
+        self.firstPage();
       };
-    });
+    });  
   };
 });
+  
+}
+
+login.prototype.firstPage = function(){
+  var self=this;
+  var $=cheerio.load(self.mainbody);
+  $('div[class=c]').each(function(i,e) {
+    console.log(i);
+    console.log(e);
+  });
+
 }
 
 login.prototype.echo = function(){
