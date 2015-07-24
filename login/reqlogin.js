@@ -58,7 +58,7 @@ login.prototype.loginSina = function(){
     console.log("jump first:"+self.jumpurl);
     request.get(self.jumpurl,function(error,response,body){
       if (!error) {
-        console.log(response.statusCode);
+        //console.log(response.statusCode);
         self.mainbody = response.body;
         //console.log(self.mainbody);
         self.firstPage();
@@ -73,10 +73,10 @@ login.prototype.firstPage = function(){
   var self=this;
   var $=cheerio.load(self.mainbody);
   $('div[class=c]').each(function(i,e) {
-    console.log(i);
-    console.log(e);
+   if ($(e).attr('id')) {
+    console.log(e.children[0].children[0].children[0].data);
+   };
   });
-
 }
 
 login.prototype.echo = function(){
