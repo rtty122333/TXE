@@ -1,5 +1,6 @@
 var request = require("request").defaults({jar: true});
 var cheerio = require("cheerio");
+var json4line = require('../utils/json4line.js');
 
 function login(){
   this.backURL=null;
@@ -10,6 +11,18 @@ function login(){
   this.posturl=null;
   this.jumpurl=null;
   this.mainbody=null;
+  this.mobile=null;
+  this.password=null;
+}
+
+login.prototype.initAccount = function(){
+  var self=this;
+  json4line.readJSONFile('./account/account.json', function(err, file) {
+  if(err) return console.log(err);
+  self.mobile = file.mobile;
+  self.password = file.passwd;
+  self.initPage();
+});
 }
 
 login.prototype.initPage = function(){
@@ -39,16 +52,17 @@ login.prototype.initPage = function(){
 login.prototype.loginSina = function(){
   var self=this;
   var formdata={
-    mobile: ''
+    
   }
-  formdata[self.passwd] = '';
+  formdata['mobile'] = self.mobile;
+  formdata[self.passwd] = self.password;
   formdata['remember'] = 'on';
   formdata['backURL'] = self.backURL;
   formdata['backTitle'] = self.backTitle;
   formdata['tryCount'] = self.tryCount;
   formdata['vk'] = self.vk;
   formdata['submit'] = '登录';
-  //console.log(formdata);
+  console.log(formdata);
   request.post({url:self.posturl, formData: formdata}, function optionalCallback(err, httpResponse, body) {
   if (err) {
     return console.error('upload failed:', err);
