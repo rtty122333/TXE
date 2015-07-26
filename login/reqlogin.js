@@ -2,20 +2,20 @@ var request = require("request").defaults({jar: true});
 var cheerio = require("cheerio");
 var json4line = require('../utils/json4line.js');
 
+/**
+ * 处理微博登录。
+ * @class
+ */
 function login(){
-  /**
-   * holds parameters to be posted
-   * @member {Object}
-   */
+  /** 包含登录 POST 所需要的参数。
+   * @member {Object} */
   this.formData = {
     'submit' : '登录',
     'remember' : 'on'
   };
 
-  /**
-   * parameters needed to be read from the request response
-   * @member {Array}
-   */
+  /** 需要从登录页面中读取的参数名。这些参数之后将加入 [formData]{@link login#formData} 中。
+   * @member {Array} */
   this.required_fields = [
     'backURL',
     'backTitle',
@@ -23,17 +23,20 @@ function login(){
     'vk'
   ];
 
-  /**
-   * the password input name that varies in every login
-   * @member {String}
-   */
+  /** 登录页面中密码框的名称（每次登录不同）。
+   * @member {String} */
   this.passInputName = null;
 
   this.posturl   = null;
   this.jumpurl   = null;
   this.mainbody  = null;
-  // read from config file
+
+  /** 用户名。
+   * @member {String} */
   this.mobile    = null;
+
+  /** 登录密码。
+   * @member {String} */
   this.password  = null;
 }
 
@@ -86,15 +89,15 @@ login.prototype.loginSina = function(){
     if (err) {
       return console.error('upload failed:', err);
     }
-    console.log(httpResponse.leaders);
+    //console.log(httpResponse.leaders);
     if (httpResponse.headers.location != undefined) {
       self.jumpurl = httpResponse.headers.location;
       console.log("jump first:" + self.jumpurl);
       request.get(self.jumpurl, function(error, response, body){
         if (!error) {
-          console.log(response.statusCode);
+          //console.log(response.statusCode);
           self.mainbody = response.body;
-          console.log(self.mainbody);
+          //console.log(self.mainbody);
           self.firstPage();
         }
       });
