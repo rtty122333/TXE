@@ -1,0 +1,11 @@
+{
+	"name": "TXE",
+	"version": "0.0.1",
+	"description": "WEIBO analyzer",
+	"main": "main.js",
+	"man": "",
+	"dependencies": {
+		"cheerio": "0.19.0",
+		"request": "2.60.0"
+	}
+}
