@@ -113,33 +113,59 @@ login.prototype.firstPage = function(){
     if ($(e).attr('id')) {
       //console.log(e.children[0].children[0].children[0].data);
       switch (e.children.length) {
-        case 1:
+        case 1: //origin create with no pic
           if (e.children[0].children[0].attribs.class == "nk") {
             msg = e.children[0].children[0].children[0].data;
           };
           e.children[0].children.forEach(function(m) {
             if (m.name == "span" && m.attribs.class == "ctt") {
+              m.children.forEach(function(n){
+                if (n.data !== undefined) {
+                  msg += n.data;
+                };
+                if (n.name == 'a') {
+                  msg += n.children[0].data;
+                };     
+              });       
+            };
+            if (m.name == "a" && m.attribs.class !== "nk") {
               msg += m.children[0].data;
+            };
+            if (m.name == "span" && m.attribs.class == "ct") {
+              msg +=m.children[0].data;
             };
           });
           console.log(msg);
           break;
-        case 2:
+        case 2: //origin create with pic &&  foword with no pic
+        /*
           if (e.children[0].children[0].attribs.class == "nk") {
             msg = e.children[0].children[0].children[0].data;
           };
           e.children[0].children.forEach(function(m) {
+            if (m.name == "span" && m.attribs.class == "cmt") {
+              if (m.children.length > 1) {
+                msg += m.children[0].data;
+                msg += m.children[1].children[0].data;
+                msg += m.children[m.children.length-1].data;
+              }else{
+                msg += m.children[0].data;
+              }
+            };
             if (m.name == "span" && m.attribs.class == "ctt") {
               msg += m.children[0].data;
             };
           });
           console.log(msg);
+          */
           break;
         case 3:
+        /*
           if (e.children[0].children[0].attribs.class == "nk") {
             msg = e.children[0].children[0].children[0].data;
           };
           console.log(msg);
+          */
           break;
         default:
           ;
