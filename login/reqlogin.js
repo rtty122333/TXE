@@ -74,7 +74,7 @@ login.prototype.initPage = function(){
 
     self.formData['mobile'] = self.mobile;
 
-    self.echo();
+ //   self.echo();
     self.loginSina();
   } else {
     console.log("request failed, status code: " + response.statusCode);
@@ -92,7 +92,7 @@ login.prototype.loginSina = function(){
     //console.log(httpResponse.leaders);
     if (httpResponse.headers.location != undefined) {
       self.jumpurl = httpResponse.headers.location;
-      console.log("jump first:" + self.jumpurl);
+ //     console.log("jump first:" + self.jumpurl);
       request.get(self.jumpurl, function(error, response, body){
         if (!error) {
           //console.log(response.statusCode);
@@ -106,11 +106,44 @@ login.prototype.loginSina = function(){
 }
 
 login.prototype.firstPage = function(){
-  var self=this;
-  var $=cheerio.load(self.mainbody);
-  $('div[class=c]').each(function(i,e) {
+  var self = this;
+  var msg = null;
+  var $ = cheerio.load(self.mainbody);
+  $('div[class=c]').each(function(i, e) {
     if ($(e).attr('id')) {
-      console.log(e.children[0].children[0].children[0].data);
+      //console.log(e.children[0].children[0].children[0].data);
+      switch (e.children.length) {
+        case 1:
+          if (e.children[0].children[0].attribs.class == "nk") {
+            msg = e.children[0].children[0].children[0].data;
+          };
+          e.children[0].children.forEach(function(m) {
+            if (m.name == "span" && m.attribs.class == "ctt") {
+              msg += m.children[0].data;
+            };
+          });
+          console.log(msg);
+          break;
+        case 2:
+          if (e.children[0].children[0].attribs.class == "nk") {
+            msg = e.children[0].children[0].children[0].data;
+          };
+          e.children[0].children.forEach(function(m) {
+            if (m.name == "span" && m.attribs.class == "ctt") {
+              msg += m.children[0].data;
+            };
+          });
+          console.log(msg);
+          break;
+        case 3:
+          if (e.children[0].children[0].attribs.class == "nk") {
+            msg = e.children[0].children[0].children[0].data;
+          };
+          console.log(msg);
+          break;
+        default:
+          ;
+      }
     };
   });
 }
