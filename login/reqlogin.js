@@ -143,8 +143,8 @@ login.prototype.firstPage = function() {
           //To Do : replace this with save msg function.
           console.log(msg);
           break;
-        case 2: //origin create with pic &&  foword with no pic
 
+        case 2: //origin create with pic &&  foword with no pic
           if (e.children[0].children[0].attribs.class == "nk") {
             msg = e.children[0].children[0].children[0].data;
           };
@@ -176,7 +176,6 @@ login.prototype.firstPage = function() {
           });
           //deal with the second div
           if (e.children[1].children[0].name == "span" && e.children[1].children[0].attribs.class == "cmt") { //foword
-
             e.children[1].children.forEach(function(m) {
               if (m.name == "span" && m.attribs.class == "cmt") {
                 if (m.children.length > 1) {
@@ -191,13 +190,18 @@ login.prototype.firstPage = function() {
                 msg += m.children[0].data;
               };
               if (m.name == "span" && m.attribs.class == "ct") {
-                msg += m.children[0].data;
+                m.children.forEach(function(n){
+                  if (n.name == "a") {
+                    msg += n.children[0].data;
+                  }else{
+                    msg += n.data;
+                  }
+                });
               };
               if (m.name == "span" && m.attribs.class == "cmt" && m.children[0].data == "转发理由:") {
                 msg += m.next.data;
               };
             });
-
           } else { //origin sent
             e.children[1].children.forEach(function(m) {
               if (m.children !== undefined) {
@@ -210,18 +214,82 @@ login.prototype.firstPage = function() {
               };
             });
           }
-
           //To Do : replace this with save msg function.
           console.log(msg);
-
           break;
-        case 3:
-          /*
-            if (e.children[0].children[0].attribs.class == "nk") {
-              msg = e.children[0].children[0].children[0].data;
+
+        case 3: //forward with pic
+          if (e.children[0].children[0].attribs.class == "nk") {
+            msg = e.children[0].children[0].children[0].data;
+          };
+          //deal with the first div
+          e.children[0].children.forEach(function(m) {
+            if (m.name == "span" && m.attribs.class == "cmt") {
+              if (m.children.length > 1) {
+                msg += m.children[0].data;
+                msg += m.children[1].children[0].data;
+                msg += m.children[m.children.length - 1].data;
+              } else {
+                msg += m.children[0].data;
+              }
             };
-            console.log(msg);
-            */
+            if (m.name == "span" && m.attribs.class == "ctt") {
+              m.children.forEach(function(n) {
+                if (n.data !== undefined) {
+                  msg += n.data;
+                };
+                if (n.name == 'a') {
+                  msg += n.children[0].data;
+                };
+              });
+            };
+            if (m.name == "a" && m.attribs.class !== "nk") {
+              msg += ' ';
+              msg += m.children[0].data;
+            };
+          });
+          //deal with the second div
+          e.children[1].children.forEach(function(m) {
+              if (m.children !== undefined) {
+                if (m.children[0].name == "img") {
+                  //To Do ...  deal with img
+                } else {
+                  msg += ' ';
+                  msg += m.children[0].data;
+                }
+              };
+            });
+          //deal with the third div
+          if (e.children[2].children[0].name == "span" && e.children[2].children[0].attribs.class == "cmt") { //foword
+            e.children[2].children.forEach(function(m) {
+              if (m.name == "span" && m.attribs.class == "cmt") {
+                if (m.children.length > 1) {
+                  msg += m.children[0].data;
+                  msg += m.children[2].children[0].data;
+                  msg += m.children[m.children.length - 1].data;
+                } else {
+                  msg += m.children[0].data;
+                }
+              };
+              if (m.name == "a") {
+                msg += m.children[0].data;
+              };
+              if (m.name == "span" && m.attribs.class == "ct") {
+                m.children.forEach(function(n){
+                  if (n.name == "a") {
+                    msg += n.children[0].data;
+                  }else{
+                    msg += n.data;
+                  }
+                });
+              };
+              if (m.name == "span" && m.attribs.class == "cmt" && m.children[0].data == "转发理由:") {
+                msg += m.next.data;
+              };
+            });
+          } 
+          console.log(msg);
+
           break;
         default:
           ;
