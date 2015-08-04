@@ -1,4 +1,6 @@
-var request = require("request").defaults({jar: true});
+var request = require("request").defaults({
+  jar: true
+});
 var cheerio = require("cheerio");
 var json4line = require('../utils/json4line.js');
 
@@ -6,12 +8,12 @@ var json4line = require('../utils/json4line.js');
  * 处理微博登录。
  * @class
  */
-function login(){
+function login() {
   /** 包含登录 POST 所需要的参数。
    * @member {Object} */
   this.formData = {
-    'submit' : '登录',
-    'remember' : 'on'
+    'submit': '登录',
+    'remember': 'on'
   };
 
   /** 需要从登录页面中读取的参数名。这些参数之后将加入 [formData]{@link login#formData} 中。
@@ -27,20 +29,20 @@ function login(){
    * @member {String} */
   this.passInputName = null;
 
-  this.posturl   = null;
-  this.jumpurl   = null;
-  this.mainbody  = null;
+  this.posturl = null;
+  this.jumpurl = null;
+  this.mainbody = null;
 
   /** 用户名。
    * @member {String} */
-  this.mobile    = null;
+  this.mobile = null;
 
   /** 登录密码。
    * @member {String} */
-  this.password  = null;
+  this.password = null;
 }
 
-login.prototype.initAccount = function(){
+login.prototype.initAccount = function() {
   var self = this;
   json4line.readJSONFile('./account/account.json', function(err, file) {
     if (err) return console.log(err);
@@ -50,50 +52,53 @@ login.prototype.initAccount = function(){
   });
 }
 
-login.prototype.initPage = function(){
+login.prototype.initPage = function() {
   var self = this;
   request('http://login.weibo.cn/login/?ns=1&revalid=2' +
-          '&backURL=http%3A%2F%2Fweibo.cn%2F&backTitle=%CE%A2%B2%A9&vt=',
-          function(error, response, body) {
+    '&backURL=http%3A%2F%2Fweibo.cn%2F&backTitle=%CE%A2%B2%A9&vt=',
+    function(error, response, body) {
 
-  if (!error && response.statusCode == 200) {
-    var $ = cheerio.load(body);
+      if (!error && response.statusCode == 200) {
+        var $ = cheerio.load(body);
 
-    self.posturl='http://login.weibo.cn/login/'+$('form').attr('action');
+        self.posturl = 'http://login.weibo.cn/login/' + $('form').attr('action');
 
-    $('input[type=hidden]').each(function(i, e) {
-      var name = $(e).attr('name');
-      var value = $(e).attr('value');
-      if (self.required_fields.indexOf(name) > 0) {
-        self.formData[name] = value;
+        $('input[type=hidden]').each(function(i, e) {
+          var name = $(e).attr('name');
+          var value = $(e).attr('value');
+          if (self.required_fields.indexOf(name) > 0) {
+            self.formData[name] = value;
+          }
+        });
+
+        self.passInputName = $('input[type=password]').attr('name');
+        self.formData[self.passInputName] = self.password;
+
+        self.formData['mobile'] = self.mobile;
+
+        //   self.echo();
+        self.loginSina();
+      } else {
+        console.log("request failed, status code: " + response.statusCode);
       }
     });
-
-    self.passInputName = $('input[type=password]').attr('name');
-    self.formData[self.passInputName] = self.password;
-
-    self.formData['mobile'] = self.mobile;
-
- //   self.echo();
-    self.loginSina();
-  } else {
-    console.log("request failed, status code: " + response.statusCode);
-  }
-});
 }
 
-login.prototype.loginSina = function(){
+login.prototype.loginSina = function() {
   var self = this;
 
-  request.post({ url:self.posturl, formData: self.formData }, function optionalCallback(err, httpResponse, body) {
+  request.post({
+    url: self.posturl,
+    formData: self.formData
+  }, function optionalCallback(err, httpResponse, body) {
     if (err) {
       return console.error('upload failed:', err);
     }
     //console.log(httpResponse.leaders);
     if (httpResponse.headers.location != undefined) {
       self.jumpurl = httpResponse.headers.location;
- //     console.log("jump first:" + self.jumpurl);
-      request.get(self.jumpurl, function(error, response, body){
+      //     console.log("jump first:" + self.jumpurl);
+      request.get(self.jumpurl, function(error, response, body) {
         if (!error) {
           //console.log(response.statusCode);
           self.mainbody = response.body;
@@ -105,7 +110,7 @@ login.prototype.loginSina = function(){
   });
 }
 
-login.prototype.firstPage = function(){
+login.prototype.firstPage = function() {
   var self = this;
   var msg = null;
   var $ = cheerio.load(self.mainbody);
@@ -119,53 +124,104 @@ login.prototype.firstPage = function(){
           };
           e.children[0].children.forEach(function(m) {
             if (m.name == "span" && m.attribs.class == "ctt") {
-              m.children.forEach(function(n){
+              m.children.forEach(function(n) {
                 if (n.data !== undefined) {
                   msg += n.data;
                 };
                 if (n.name == 'a') {
                   msg += n.children[0].data;
-                };     
-              });       
+                };
+              });
             };
             if (m.name == "a" && m.attribs.class !== "nk") {
               msg += m.children[0].data;
             };
             if (m.name == "span" && m.attribs.class == "ct") {
-              msg +=m.children[0].data;
+              msg += m.children[0].data;
             };
           });
+          //To Do : replace this with save msg function.
           console.log(msg);
           break;
         case 2: //origin create with pic &&  foword with no pic
-        /*
+
           if (e.children[0].children[0].attribs.class == "nk") {
             msg = e.children[0].children[0].children[0].data;
           };
+          //deal with the first div
           e.children[0].children.forEach(function(m) {
             if (m.name == "span" && m.attribs.class == "cmt") {
               if (m.children.length > 1) {
                 msg += m.children[0].data;
                 msg += m.children[1].children[0].data;
-                msg += m.children[m.children.length-1].data;
-              }else{
+                msg += m.children[m.children.length - 1].data;
+              } else {
                 msg += m.children[0].data;
               }
             };
             if (m.name == "span" && m.attribs.class == "ctt") {
+              m.children.forEach(function(n) {
+                if (n.data !== undefined) {
+                  msg += n.data;
+                };
+                if (n.name == 'a') {
+                  msg += n.children[0].data;
+                };
+              });
+            };
+            if (m.name == "a" && m.attribs.class !== "nk") {
+              msg += ' ';
               msg += m.children[0].data;
             };
           });
+          //deal with the second div
+          if (e.children[1].children[0].name == "span" && e.children[1].children[0].attribs.class == "cmt") { //foword
+
+            e.children[1].children.forEach(function(m) {
+              if (m.name == "span" && m.attribs.class == "cmt") {
+                if (m.children.length > 1) {
+                  msg += m.children[0].data;
+                  msg += m.children[1].children[0].data;
+                  msg += m.children[m.children.length - 1].data;
+                } else {
+                  msg += m.children[0].data;
+                }
+              };
+              if (m.name == "a") {
+                msg += m.children[0].data;
+              };
+              if (m.name == "span" && m.attribs.class == "ct") {
+                msg += m.children[0].data;
+              };
+              if (m.name == "span" && m.attribs.class == "cmt" && m.children[0].data == "转发理由:") {
+                msg += m.next.data;
+              };
+            });
+
+          } else { //origin sent
+            e.children[1].children.forEach(function(m) {
+              if (m.children !== undefined) {
+                if (m.children[0].name == "img") {
+                  //To Do ...  deal with img
+                } else {
+                  msg += ' ';
+                  msg += m.children[0].data;
+                }
+              };
+            });
+          }
+
+          //To Do : replace this with save msg function.
           console.log(msg);
-          */
+
           break;
         case 3:
-        /*
-          if (e.children[0].children[0].attribs.class == "nk") {
-            msg = e.children[0].children[0].children[0].data;
-          };
-          console.log(msg);
-          */
+          /*
+            if (e.children[0].children[0].attribs.class == "nk") {
+              msg = e.children[0].children[0].children[0].data;
+            };
+            console.log(msg);
+            */
           break;
         default:
           ;
@@ -174,7 +230,7 @@ login.prototype.firstPage = function(){
   });
 }
 
-login.prototype.echo = function(){
+login.prototype.echo = function() {
   console.log(this.formData);
   console.log(this.passInputName);
   console.log(this.posturl);
