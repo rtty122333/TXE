@@ -110,6 +110,16 @@ login.prototype.loginSina = function() {
   });
 }
 
+login.prototype.getRequest = function(){
+  var self = this;
+  if (self.mainbody == null) {
+    console.log("Please login first");
+    return;
+  }else{
+    return request;
+  }
+}
+
 login.prototype.firstPage = function() {
   var self = this;
   var msg = null;
@@ -190,10 +200,10 @@ login.prototype.firstPage = function() {
                 msg += m.children[0].data;
               };
               if (m.name == "span" && m.attribs.class == "ct") {
-                m.children.forEach(function(n){
+                m.children.forEach(function(n) {
                   if (n.name == "a") {
                     msg += n.children[0].data;
-                  }else{
+                  } else {
                     msg += n.data;
                   }
                 });
@@ -250,15 +260,15 @@ login.prototype.firstPage = function() {
           });
           //deal with the second div
           e.children[1].children.forEach(function(m) {
-              if (m.children !== undefined) {
-                if (m.children[0].name == "img") {
-                  //To Do ...  deal with img
-                } else {
-                  msg += ' ';
-                  msg += m.children[0].data;
-                }
-              };
-            });
+            if (m.children !== undefined) {
+              if (m.children[0].name == "img") {
+                //To Do ...  deal with img
+              } else {
+                msg += ' ';
+                msg += m.children[0].data;
+              }
+            };
+          });
           //deal with the third div
           if (e.children[2].children[0].name == "span" && e.children[2].children[0].attribs.class == "cmt") { //foword
             e.children[2].children.forEach(function(m) {
@@ -275,10 +285,10 @@ login.prototype.firstPage = function() {
                 msg += m.children[0].data;
               };
               if (m.name == "span" && m.attribs.class == "ct") {
-                m.children.forEach(function(n){
+                m.children.forEach(function(n) {
                   if (n.name == "a") {
                     msg += n.children[0].data;
-                  }else{
+                  } else {
                     msg += n.data;
                   }
                 });
@@ -287,8 +297,8 @@ login.prototype.firstPage = function() {
                 msg += m.next.data;
               };
             });
-          } 
-           //To Do : replace this with save msg function.
+          }
+          //To Do : replace this with save msg function.
           console.log(msg);
 
           break;
