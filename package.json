@@ -1,13 +1,14 @@
 {
 	"name": "TXE",
 	"version": "0.0.1",
-	"license": "GPL v2",
+	"license": "GPL-2.0",
 	"description": "WEIBO analyzer",
 	"repository": "https://github.com/rtty122333/TXE",
 	"main": "main.js",
 	"man": "",
 	"dependencies": {
 		"cheerio": "0.19.0",
-		"request": "2.60.0"
+		"request": "2.60.0",
+        "nodejieba": "1.4.1"
 	}
 }

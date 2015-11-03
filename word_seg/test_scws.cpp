@@ -6,7 +6,7 @@ int main()
 {
     scws_t s;
     scws_res_t res, cur;
-    std::string text("Hello, 我名字叫李那曲是一个中国人, 我有时买Q币来玩, 我还听说过C#语言");
+    std::string text("他来到了网易杭研大厦");
 
     if (!(s = scws_new())) {
         std::cerr << "ERROR: can't init the scws!" << std::endl;
