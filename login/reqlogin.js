@@ -76,7 +76,7 @@ login.prototype.initPage = function() {
 
         self.formData['mobile'] = self.mobile;
 
-        //   self.echo();
+        //self.echo();
         self.loginSina();
       } else {
         console.log("request failed, status code: " + response.statusCode);
@@ -94,18 +94,22 @@ login.prototype.loginSina = function() {
     if (err) {
       return console.error('upload failed:', err);
     }
-    //console.log(httpResponse.leaders);
     if (httpResponse.headers.location != undefined) {
       self.jumpurl = httpResponse.headers.location;
-      //     console.log("jump first:" + self.jumpurl);
+      console.log("jump first:" + self.jumpurl);
       request.get(self.jumpurl, function(error, response, body) {
         if (!error) {
           //console.log(response.statusCode);
           self.mainbody = response.body;
           //console.log(self.mainbody);
           self.firstPage();
+        }else{
+          console.log(error);
         }
       });
+    }else{
+      console.log("Todo: take off the picture verification");
+      //console.log(httpResponse);
     }
   });
 }
@@ -298,7 +302,7 @@ login.prototype.firstPage = function() {
               };
             });
           }
-          //To Do : replace this with save msg function.
+          // TODO: replace this with save msg function.
           console.log(msg);
 
           break;
